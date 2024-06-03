@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>CodePen - [ Final ] เครื่องมือคำนวนราคาขายสินค้า</title>
+  
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เครื่องมือคำนวณภาษี</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f3e4;
+            color: #5c4033;
+            padding: 20px;
+        }
+        h1 {
+            color: #8b5e34;
+            text-align: center;
+        }
+        h2 {
+            color: #8b5e34;
+            margin-top: 0;
+        }
+        label, input, select, button {
+            display: block;
+            margin: 10px 0;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #8b5e34;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #d4a373;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #b97a56;
+        }
+        p {
+            margin: 5px 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+        }
+        .section {
+            background-color: #fffaf0;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .result, .explanation {
+            background-color: #f1ebe1;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+    </style>
+    <script>
+        function calculate() {
+            let cost = parseFloat(document.getElementById('cost').value);
+            let desiredProfitRate = parseFloat(document.getElementById('profitRate').value) / 100;
+            let includeVAT = document.getElementById('includeVAT').value === 'true';
+            let includeCorporateTax = document.getElementById('includeCorporateTax').value === 'true';
+            let includeCommission = document.getElementById('includeCommission').value === 'true';
+            
+            let vatRate = 0.07;
+            let corporateTaxRate = 0.20;
+            let commissionRate = 0.07;  // 7% commission for online sales
+
+            // Calculate desired profit amount
+            let desiredProfit = cost * desiredProfitRate;
+
+            // Calculate total before corporate tax
+            let totalBeforeCorporateTax = cost + desiredProfit;
+
+            // Adjust for commission
+            let totalIncludingCommission = totalBeforeCorporateTax;
+            if (includeCommission) {
+                totalIncludingCommission = totalBeforeCorporateTax / (1 - commissionRate);
+            }
+
+            // Calculate corporate tax amount
+            let corporateTaxAmount = 0;
+            if (includeCorporateTax) {
+                corporateTaxAmount = desiredProfit * corporateTaxRate;
+            }
+
+            // Calculate total including corporate tax
+            let totalIncludingCorporateTax = totalIncludingCommission + corporateTaxAmount;
+
+            // Calculate VAT amount
+            let vatAmount = 0;
+            if (includeVAT) {
+                vatAmount = totalIncludingCorporateTax * vatRate;
+            }
+
+            // Calculate final selling price including VAT
+            let finalSellingPrice = totalIncludingCorporateTax + vatAmount;
+
+            document.getElementById('sellingPrice').innerText = finalSellingPrice.toFixed(2) + ' บาท';
+            document.getElementById('explanation').innerHTML = `
+                <strong>คำอธิบายผลลัพธ์:</strong><br>
+                <ul>
+                    <li>ต้นทุนสินค้า: ${cost.toFixed(2)} บาท</li>
+                    <li>กำไรที่ต้องการ: ${desiredProfit.toFixed(2)} บาท (${desiredProfitRate * 100}% ของต้นทุนสินค้า)</li>
+                    <li>รวมต้นทุนและกำไร: ${totalBeforeCorporateTax.toFixed(2)} บาท</li>
+                    ${includeCommission ? `<li>ราคาขายรวมค่าคอมมิชชั่น (7%): ${totalIncludingCommission.toFixed(2)} บาท</li>` : ''}
+                    ${includeCorporateTax ? `<li>ภาษีเงินได้นิติบุคคล (20% ของกำไร): ${corporateTaxAmount.toFixed(2)} บาท</li>` : ''}
+                    ${includeCorporateTax ? `<li>รวมต้นทุน, กำไร, ค่าคอมมิชชั่น และภาษีเงินได้นิติบุคคล: ${totalIncludingCorporateTax.toFixed(2)} บาท</li>` : ''}
+                    ${includeVAT ? `<li>ภาษีมูลค่าเพิ่ม (7%): ${vatAmount.toFixed(2)} บาท</li>` : ''}
+                    <li>ราคาขายรวม VAT: ${finalSellingPrice.toFixed(2)} บาท</li>
+                </ul>
+                <b>ราคาขายนี้คิดจากต้นทุนสินค้า ${cost.toFixed(2)} บาท เพื่อให้ได้กำไร ${desiredProfitRate * 100}% 
+                ${includeCommission ? 'หลังหักค่าคอมมิชชั่น 7%' : ''} 
+                ${includeCorporateTax ? 'และภาษีเงินได้นิติบุคคล 20%' : ''} 
+                ${includeVAT ? 'และเพิ่มภาษีมูลค่าเพิ่ม 7%' : ''}</b>
+            `;
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>เครื่องมือคำนวณราคาขายสินค้า</h1>
+
+        <div class="section">
+            <h2>ข้อมูลต้นทุนและกำไร</h2>
+            <label for="cost">ต้นทุนสินค้า:</label>
+            <input type="number" id="cost">
+            <label for="profitRate">กำไรที่ต้องการ (%):</label>
+            <input type="number" id="profitRate">
+            <label for="includeCommission">รวมค่าคอมมิชชั่น:</label>
+            <select id="includeCommission">
+                <option value="true">ใช่</option>
+                <option value="false">ไม่ใช่</option>
+            </select>
+            <label for="includeVAT">รวมภาษีมูลค่าเพิ่ม:</label>
+            <select id="includeVAT">
+                <option value="true">ใช่</option>
+                <option value="false">ไม่ใช่</option>
+            </select>
+            <label for="includeCorporateTax">รวมภาษีเงินได้นิติบุคคล:</label>
+            <select id="includeCorporateTax">
+                <option value="true">ใช่</option>
+                <option value="false">ไม่ใช่</option>
+            </select>
+            <button onclick="calculate()">คำนวณราคาขาย</button>
+            <div class="result">
+              <p><b>ราคาขาย : <span id="sellingPrice"></span></b></p>
+            </div>
+            <div class="explanation" id="explanation"></div>
+        </div>
+    </div>
+</body>
+</html>
+<!-- partial -->
+  
+</body>
+</html>
